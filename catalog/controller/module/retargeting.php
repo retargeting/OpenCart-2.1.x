@@ -486,60 +486,58 @@ class ControllerModuleRetargeting extends Controller {
 
             /* Check if the product has a category assigned */
             if (isset($product_categories) && !empty($product_categories)) {
-
+ 
                 $product_cat = $this->model_catalog_product->getCategories($product_id);
-                $product_cat_details = $this->model_catalog_category->getCategory($product_cat[0]['category_id']);
 
-                // Resides in a parent category
-                if (isset($product_cat_details['parent_id']) && ($product_cat_details['parent_id'] == 0)) {
-                    
-                    $encoded_product_cat_name = htmlspecialchars($product_cat_details['name']);
-                    $data['sendProduct'] .= "
-                                            'category': 
-                                                [{
-                                                    'id': {$product_cat_details['category_id']},
-                                                    'name': '{$encoded_product_cat_name}',
-                                                    'parent': false,
-                                                    'breadcrumb': []
-                                                }],
-                                            ";
+                $catDetails = array();
+                foreach ($product_cat as $pcatid) {
+                    $categoryDetails = $this->model_catalog_category->getCategory($pcatid['category_id']);
+                    if(isset($categoryDetails['status']) && $categoryDetails['status'] == 1) {
+                        $catDetails[] = $categoryDetails;
+                    }
+                }
 
-                // Resides in a nested category (child -> go up until parent)
-                } else {
+                $preCat = [];
+                foreach ($catDetails as $productCategory) {
+                    if (isset($productCategory['parent_id']) && ($productCategory['parent_id'] == 0)) {
+                        $preCat[] = [
+                            'id' => $productCategory['category_id'],
+                            'name' => htmlspecialchars($productCategory['name']),
+                            'parent' => false,
+                            'breadcrumb' => []
+                        ];
 
-                    $product_cat_details_parent = $this->model_catalog_category->getCategory($product_cat_details['parent_id']);
-                    $encoded_product_cat_name = htmlspecialchars($product_cat_details['name']);
-                    $encoded_product_cat_parent_name = htmlspecialchars($product_cat_details_parent['name']);
-                    
-                    // Get the top level category
-                    $data['sendProduct'] .= "
-                                            'category': [{
-                                                'id': {$product_cat_details['category_id']},
-                                                'name': '{$encoded_product_cat_name}',
-                                                'parent': {$product_cat_details['parent_id']},
-                                                'breadcrumb': [
-                                                    {
-                                                        'id': {$product_cat_details_parent['category_id']},
-                                                        'name': '{$encoded_product_cat_parent_name}',
-                                                        'parent': false
-                                                    }
-                                                ]
-                                            }
-                                            ]";
+                    } else {
 
-                } // Close elseif
+                        $breadcrumbDetails =  $this->model_catalog_category->getCategory($productCategory['parent_id']);
+                        $preCat[] = [
+                            'id' => (int)$productCategory['category_id'],
+                            'name' => htmlspecialchars($productCategory['name']),
+                            'parent' => 1,
+                            // 'parent' => (int)$productCategory['parent_id'],
+                            'breadcrumb' => [[
+                                'id' => 1,
+                                'name' => 'Root',
+                                'parent' => false    
+                            ]]
+                        ];
+                    }
+                }
+
+
+                $data['sendProduct'] .= "'" . 'category' . "':" . json_encode($preCat);
 
             } else {
-                $data['sendProduct'] .= "
-                    'category': 
-                        [{
-                            'id': 1,
-                            'name': 'Root',
-                            'parent': false,
-                            'breadcrumb': []
-                        }],
-                    ";
-            }// Close check if product has categories assigned
+                $emergencyCategory[] = [
+                    'id' => 1,
+                    'name' => 'Root',
+                    'parent' => false,
+                    'breadcrumb' => []
+                ];
+
+                $data['sendProduct'] .= "'" . 'category' . "':" . json_encode($emergencyCategory);
+
+             }// Close check if product has categories assigned
 
             $data['sendProduct'] .= "};"; // Close _ra.sendProductInfo
             $data['sendProduct'] .= "
@@ -742,7 +740,12 @@ class ControllerModuleRetargeting extends Controller {
               $discount_code = isset($this->session->data['retargeting_discount_code']) ? $this->session->data['retargeting_discount_code'] : 0;
               $total_discount_value = 0;
               $shipping_value = 0;
-              $total_order_value = $data['order_data']['total'];
+              $total_order_value = $this->currency->format(
+                  $data['order_data']['total'],
+                  $data['order_data']['currency_code'],
+                  $data['order_data']['currency_value'],
+                  false
+              );
 
               // Based on order id, grab the ordered products
               $order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$data['order_id'] . "'");
@@ -769,11 +772,17 @@ class ControllerModuleRetargeting extends Controller {
               /* -------------------------------------- */
               $data['saveOrder'] .= "_ra.saveOrderProducts = [";
               for ($i = count($order_product_query->rows) - 1; $i >= 0; $i--) {
+                $product_price = $this->currency->format(
+                    $order_product_query->rows[$i]['price'],
+                    $data['order_data']['currency_code'],
+                    $data['order_data']['currency_value'],
+                    false
+                );
                   if ($i == 0) {
                       $data['saveOrder'] .= "{
                                                   'id': {$order_product_query->rows[$i]['product_id']},
                                                   'quantity': {$order_product_query->rows[$i]['quantity']},
-                                                  'price': {$order_product_query->rows[$i]['price']},
+                                                  'price': {$product_price},
                                                   'variation_code': ''
                                                   }";
                       break;
@@ -781,7 +790,7 @@ class ControllerModuleRetargeting extends Controller {
                   $data['saveOrder'] .= "{
                                               'id': {$order_product_query->rows[$i]['product_id']},
                                               'quantity': {$order_product_query->rows[$i]['quantity']},
-                                              'price': {$order_product_query->rows[$i]['price']},
+                                              'price': {$product_price},
                                               'variation_code': ''
                                               },";
               }
