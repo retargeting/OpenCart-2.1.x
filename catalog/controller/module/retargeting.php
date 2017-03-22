@@ -497,20 +497,20 @@ class ControllerModuleRetargeting extends Controller {
                     }
                 }
 
-                $preCat = [];
+                $preCat = array();
                 foreach ($catDetails as $productCategory) {
                     if (isset($productCategory['parent_id']) && ($productCategory['parent_id'] == 0)) {
-                        $preCat[] = [
+                        $preCat = array([
                             'id' => $productCategory['category_id'],
                             'name' => htmlspecialchars($productCategory['name']),
                             'parent' => false,
                             'breadcrumb' => []
-                        ];
+                        ]);
 
                     } else {
 
                         $breadcrumbDetails =  $this->model_catalog_category->getCategory($productCategory['parent_id']);
-                        $preCat[] = [
+                        $preCat = array([
                             'id' => (int)$productCategory['category_id'],
                             'name' => htmlspecialchars($productCategory['name']),
                             'parent' => 1,
@@ -520,7 +520,7 @@ class ControllerModuleRetargeting extends Controller {
                                 'name' => 'Root',
                                 'parent' => false    
                             ]]
-                        ];
+                        ]);
                     }
                 }
 
@@ -528,12 +528,12 @@ class ControllerModuleRetargeting extends Controller {
                 $data['sendProduct'] .= "'" . 'category' . "':" . json_encode($preCat);
 
             } else {
-                $emergencyCategory[] = [
+                $emergencyCategory = array([
                     'id' => 1,
                     'name' => 'Root',
                     'parent' => false,
                     'breadcrumb' => []
-                ];
+                ]);
 
                 $data['sendProduct'] .= "'" . 'category' . "':" . json_encode($emergencyCategory);
 
