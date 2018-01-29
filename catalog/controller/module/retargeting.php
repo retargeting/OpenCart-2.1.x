@@ -1,6 +1,6 @@
 <?php
 /**
- * Retargeting Tracker v2.3.0 for OpenCart 2.1.x
+ * Retargeting Tracker v2.1.0 for OpenCart 2.1.x
  *
  * catalog/controller/module/retargeting.php
  */
