@@ -8,7 +8,7 @@ In order to implement the Retargeting Tracker extension you need to setup a [Ret
 
 Install
 =======================
-- Download the [Retargeting Tracker](https://github.com/retargeting/OpenCart-2.2.x/archive/master.zip) extension
+- Download the [Retargeting Tracker](https://github.com/retargeting/OpenCart-2.1.x/archive/master.zip) extension
 - Go to your website OpenCart root folder (i.e: /var/www/html/myOpenCart/)
 - Unarchive `OpenCart-2.1.x-master.zip`
 - Copy and paste the `admin` and `catalog` folders over the existing ones. No files should be overwritten.
