@@ -349,9 +349,9 @@ class ControllerModuleRetargeting extends Controller {
                     $data['sendCategory'] .= "
                             'id': {$category_id},
                             'name': '{$decoded_category_info_name}',
-                            'parent': {$category_id_parent},
+                            'parent': {$category_info['parent_id']},
                             'breadcrumb': [
-                            ";
+                        ";
                     break;
                 }
 
@@ -364,20 +364,21 @@ class ControllerModuleRetargeting extends Controller {
                     if ($i === 0) {
                         $decoded_category_info_parent_name = htmlspecialchars_decode($category_info_parent['name']);
                         $data['sendCategory'] .= "{
-                                                        'id': {$category_id_parent},
-                                                        'name': '{$decoded_category_info_parent_name}',
-                                                        'parent': false
-                                                        }
-                                                        ";
+                                'id': {$category_id},
+                                'name': '{$decoded_category_info_parent_name}',
+                                'parent': false
+                                }
+                            ";
                         break;
-                    }
+                    } 
 
                     $data['sendCategory'] .= "{
-                                                    'id': {$category_id},
-                                                    'name': '{$decoded_category_info_name}',
-                                                    'parent': {$category_id_parent}
-                                                    },
-                                                    ";
+                        'id': {$category_id},
+                        'name': '{$decoded_category_info_name}',
+                        'parent': {$category_id_parent}
+                        },
+                    ";
+                    
                 }
 
                 $data['sendCategory'] .= "]";
