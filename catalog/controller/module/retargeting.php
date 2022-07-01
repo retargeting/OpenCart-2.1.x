@@ -102,6 +102,10 @@ class ControllerModuleRetargeting extends Controller {
         $data['retargeting_clickImage'] = htmlspecialchars_decode($this->config->get('retargeting_clickImage'));
         $data['retargeting_commentOnProduct'] = htmlspecialchars_decode($this->config->get('retargeting_commentOnProduct'));
         $data['retargeting_setVariation'] = htmlspecialchars_decode($this->config->get('retargeting_setVariation'));
+        $data['retargeting_stock'] = ($this->config->get('retargeting_stock'));
+        
+        $defStock = empty($this->config->get('retargeting_stock')) ? 0 : $this->config->get('retargeting_stock');
+        
         if (isset($_GET['csv']) && $_GET['csv'] === 'retargeting') {
 
             /* Modify the header */
@@ -161,7 +165,7 @@ class ControllerModuleRetargeting extends Controller {
                         break;
 
                         case 'stock':
-                            $NewList[$val] = ((int) $product[$key] > 0) ? 1 : 0;
+                            $NewList[$val] = ((int) $product[$key] < 0) ? $defStock : $product[$key];
                         break;
 
                         case 'price':
@@ -640,6 +644,11 @@ class ControllerModuleRetargeting extends Controller {
             $product_categories = $product_categories->rows; // Get all the subcategories for this product. Reorder its numerical indexes to ease the breadcrumb logic
             $decoded_product_name = htmlspecialchars_decode($product_details['name']);
             $decoded_product_url = htmlspecialchars_decode($product_url);
+
+            $defStock = $this->config->get('retargeting_stock') === null ?
+            0 : $this->config->get('retargeting_stock');
+            $product_details['quantity'] = $product_details['quantity'] < 0 ? $defStock : $product_details['quantity'];
+
             $rootCat = array(array(
                'id' => 'Root',
                'name' => 'Root',
@@ -671,7 +680,7 @@ class ControllerModuleRetargeting extends Controller {
                                        ),2) : 0) ."',
                                     'inventory': {
                                         'variations': false,
-                                        'stock' : ".(($product_details['quantity'] > 0) ? 1 : 0)."
+                                        'stock' : '{$product_details['quantity']}'
                                     },
                                     ";
 

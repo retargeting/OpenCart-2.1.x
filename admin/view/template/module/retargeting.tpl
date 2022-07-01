@@ -4,6 +4,9 @@
  *
  * admin/view//template/module/retargeting.tpl
  */
+
+$sel = 'selected="selected"';
+
 ?>
 <?php echo $header; ?>
 <?php echo $column_left; ?>
@@ -67,8 +70,8 @@
                         <label class="col-sm-2 control-label" for="input-status"><?php echo $entry_status; ?></label>
                         <div class="col-sm-10">
                             <select name="retargeting_status" id="input-status" class="form-control">
-                                <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
-                                <option value="0"><?php echo $text_disabled; ?></option>
+                                <option value="1"<?php if ($retargeting_status) { echo " ".$sel; } ?>><?php echo $text_enabled; ?></option>
+                                <option value="0"<?php if (empty($retargeting_status)) { echo " ".$sel; } ?>><?php echo $text_disabled; ?></option>
                             </select>
                         </div>
                     </div>
@@ -154,6 +157,18 @@
                         <div class="col-sm-10">
                             <input type="text" name="retargeting_setVariation" value="<?php echo (isset($retargeting_setVariation) && !empty($retargeting_setVariation)) ? $retargeting_setVariation : ''; ?>" placeholder="" id="input-setVariation" class="form-control" />
                             <span class="small">setVariation</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. negativeStock -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">Products with negative stock:</label>
+                        <div class="col-sm-10">
+                            <select name="retargeting_stock" id="input-status" class="form-control">
+                                <option value="1"<?php if ($retargeting_stock) { echo " ".$sel; } ?>>In stock</option>
+                                <option value="0"<?php if (empty($retargeting_stock)) { echo " ".$sel; } ?>>Out of stock</option>
+                            </select>
+                            <span class="small">If enabled, the stock status will be "in stock" if the quantity of the products is "-1", for example</span>
                         </div>
                     </div>
 

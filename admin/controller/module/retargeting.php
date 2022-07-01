@@ -160,6 +160,14 @@ class ControllerModuleRetargeting extends Controller {
         }
         /* --- END --- */
 
+        /* 7. negativeStock */
+        if (isset($this->request->post['retargeting_stock'])) {
+            $data['retargeting_stock'] = $this->request->post['retargeting_stock'];
+        } else {
+            $data['retargeting_stock'] = $this->config->get('retargeting_stock');
+        }
+        /* --- END --- */
+
         /* Common admin area items */
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
