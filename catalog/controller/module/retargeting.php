@@ -364,19 +364,19 @@ class ControllerModuleRetargeting extends Controller {
             foreach ($products as $product) {
               $retargetingFeed[] = array (
                 'id'=> $product['product_id'],
-                'price' => round(
+                'price' => number_format(
                   $this->tax->calculate(
                     $product['price'],
                     $product['tax_class_id'],
                     $this->config->get('config_tax')
-                  ), 2),
+                  ),2,'.',''),
                 'promo' => (
-                  isset($product['special']) ? round (
+                  isset($product['special']) ? number_format(
                     $this->tax->calculate(
                       $product['special'],
                       $product['tax_class_id'],
                       $this->config->get('config_tax')
-                    ), 2)
+                    ),2,'.','')
                     : 0),
                 'promo_price_end_date' => null,
                 'inventory' => array(
@@ -768,19 +768,19 @@ class ControllerModuleRetargeting extends Controller {
                                     'name': '{$decoded_product_name}',
                                     'url': '{$decoded_product_url}',
                                     'img': '{$data['shop_url']}image/{$product_details['image']}',
-                                    'price': '".round(
+                                    'price': '".number_format(
                                       $this->tax->calculate(
                                         $product_details['price'],
                                         $product_details['tax_class_id'], 
                                         $this->config->get('config_tax')
-                                      ),2)."',
+                                      ),2,'.','')."',
                                     'promo': '". (isset
-                                    ($product_details['special']) ? round(
+                                    ($product_details['special']) ? number_format(
                                       $this->tax->calculate(
                                         $product_details['special'],
                                         $product_details['tax_class_id'],
                                          $this->config->get('config_tax')
-                                       ),2) : 0) ."',
+                                        ),2,'.','') : 0) ."',
                                     'inventory': {
                                         'variations': false,
                                         'stock' : '{$product_details['quantity']}'
