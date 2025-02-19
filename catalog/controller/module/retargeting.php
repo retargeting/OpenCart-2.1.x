@@ -275,18 +275,18 @@ class ControllerModuleRetargeting extends Controller {
                                 $add = false;
                                 break;
                             }
-                            $NewList[$val] = round(
+                            $NewList[$val] = number_format(
                                 $this->tax->calculate(
                                   $product['price'],
                                   $product['tax_class_id'],
                                   $this->config->get('config_tax')
-                                ), 2);
+                                ),2,'.','');
                         break;
 
                         case 'sale price':
-                            $NewList[$val] = empty($product[$key]) ? $NewList['price'] :  round (
-                                $this->tax->calculate($product[$key], $product['tax_class_id'], $this->config->get('config_tax'))
-                            );
+                            $NewList[$val] = empty($product[$key]) ? $NewList['price'] :  number_format (
+                                $this->tax->calculate($product[$key], $product['tax_class_id'], $this->config->get('config_tax')),
+                            2,'.','');
 
                             if ((float) $product[$key] > (float) $product['price']) {
                                 $NewList[$val] = $NewList['price'];
